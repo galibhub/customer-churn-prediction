@@ -17,20 +17,21 @@ from app.routes import (
 )
 
 
+# Create FastAPI app
 app = FastAPI(
 
     title="Customer Churn Prediction API",
 
     description=(
         "AI-powered customer churn "
-        "prediction and retention API"
+        "prediction and retention system."
     ),
 
     version="1.0.0"
 )
 
 
-# React frontend-এর জন্য CORS
+# React frontend URL
 origins = [
 
     origin.strip()
@@ -44,6 +45,7 @@ origins = [
 ]
 
 
+# CORS middleware
 app.add_middleware(
 
     CORSMiddleware,
@@ -58,7 +60,7 @@ app.add_middleware(
 )
 
 
-# Routes
+# Register routers
 app.include_router(
     auth.router
 )
@@ -72,24 +74,30 @@ app.include_router(
 )
 
 
+# Root endpoint
 @app.get("/")
 def root():
 
     return {
+
         "message":
             "Customer Churn Prediction API is running"
     }
 
 
+# Health endpoint
 @app.get("/health")
 def health():
 
     return {
 
-        "status": "ok",
+        "status":
+            "ok",
 
         "database":
-            "connected"
-            if check_database_connection()
-            else "disconnected"
+            (
+                "connected"
+                if check_database_connection()
+                else "disconnected"
+            )
     }

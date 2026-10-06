@@ -1,18 +1,23 @@
 import pandas as pd
 
-from app.schemas.prediction_schema import CustomerInput
-
-from app.utils.model_loader import get_model
-
-from app.utils.recommendation import (
-    generate_recommendations
+from app.schemas.prediction_schema import (
+    CustomerInput
 )
 
 from app.services.shap_service import (
     explain_prediction
 )
 
+from app.utils.model_loader import (
+    get_model
+)
 
+from app.utils.recommendation import (
+    generate_recommendations
+)
+
+
+# Must match the training dataset
 FEATURE_COLUMNS = [
 
     "gender",
@@ -66,52 +71,80 @@ def predict_customer(
     data: CustomerInput
 ) -> dict:
 
+    # Load saved pipeline
     model = get_model()
 
-    customer_df = build_dataframe(data)
+
+    # Convert input into DataFrame
+    customer_df = build_dataframe(
+        data
+    )
+
 
     # Prediction
     prediction_value = int(
-        model.predict(customer_df)[0]
+        model.predict(
+            customer_df
+        )[0]
     )
+
 
     # Churn probability
     probability = float(
-        model.predict_proba(customer_df)[0][1]
+        model.predict_proba(
+            customer_df
+        )[0][1]
     )
 
-    # Preprocessor বের করা
+
+    # Transform data for SHAP
     preprocessor = (
-        model.named_steps["preprocessor"]
+        model.named_steps[
+            "preprocessor"
+        ]
     )
 
-    # SHAP-এর জন্য transformed data
-    transformed = preprocessor.transform(
-        customer_df
+
+    transformed_data = (
+        preprocessor.transform(
+            customer_df
+        )
     )
+
 
     # SHAP explanation
     top_factors = explain_prediction(
-        transformed
+        transformed_data
     )
 
-    # Recommendations
-    recommendations = generate_recommendations(
-        data
+
+    # Business recommendations
+    recommendations = (
+        generate_recommendations(
+            data
+        )
     )
+
 
     return {
 
         "prediction":
-            "Churn"
-            if prediction_value == 1
-            else "No Churn",
+            (
+                "Churn"
+                if prediction_value == 1
+                else "No Churn"
+            ),
 
         "churn_probability":
-            round(probability, 4),
+            round(
+                probability,
+                4
+            ),
 
         "risk_level":
-            get_risk_level(probability),
+            get_risk_level(
+                probability
+            ),
 
         "top_factors":
             top_factors,

@@ -20,13 +20,16 @@ router = APIRouter(
 
 @router.get("")
 def get_history(
-    current_user=Depends(get_current_user)
+    current_user=Depends(
+        get_current_user
+    )
 ):
 
     documents = (
         predictions_collection
         .find({
-            "user_id": current_user["_id"]
+            "user_id":
+                current_user["_id"]
         })
         .sort(
             "created_at",
@@ -35,35 +38,54 @@ def get_history(
         .limit(50)
     )
 
+
     history = []
+
 
     for document in documents:
 
         history.append({
 
             "id":
-                str(document["_id"]),
+                str(
+                    document["_id"]
+                ),
 
             "prediction":
                 document["prediction"],
 
             "churn_probability":
-                document["churn_probability"],
+                document[
+                    "churn_probability"
+                ],
 
             "risk_level":
-                document["risk_level"],
+                document[
+                    "risk_level"
+                ],
 
             "top_factors":
-                document["top_factors"],
+                document[
+                    "top_factors"
+                ],
 
             "recommendations":
-                document["recommendations"],
+                document[
+                    "recommendations"
+                ],
 
             "created_at":
-                document["created_at"].isoformat()
+                document[
+                    "created_at"
+                ].isoformat()
         })
 
+
     return {
-        "count": len(history),
-        "items": history
+
+        "count":
+            len(history),
+
+        "items":
+            history
     }

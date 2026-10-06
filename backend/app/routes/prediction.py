@@ -34,11 +34,18 @@ router = APIRouter(
 )
 def predict(
     data: CustomerInput,
-    current_user=Depends(get_current_user)
+    current_user=Depends(
+        get_current_user
+    )
 ):
 
-    result = predict_customer(data)
+    # Run ML prediction
+    result = predict_customer(
+        data
+    )
 
+
+    # Save prediction in MongoDB
     document = {
 
         "user_id":
@@ -47,20 +54,42 @@ def predict(
         "input_data":
             data.model_dump(),
 
-        **result,
+        "prediction":
+            result["prediction"],
+
+        "churn_probability":
+            result[
+                "churn_probability"
+            ],
+
+        "risk_level":
+            result["risk_level"],
+
+        "top_factors":
+            result["top_factors"],
+
+        "recommendations":
+            result["recommendations"],
 
         "created_at":
-            datetime.now(timezone.utc)
+            datetime.now(
+                timezone.utc
+            )
     }
 
-    inserted = predictions_collection.insert_one(
-        document
+
+    inserted = (
+        predictions_collection
+        .insert_one(document)
     )
+
 
     return {
 
         "prediction_id":
-            str(inserted.inserted_id),
+            str(
+                inserted.inserted_id
+            ),
 
         **result
     }
