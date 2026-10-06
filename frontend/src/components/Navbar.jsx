@@ -10,7 +10,7 @@ function Navbar() {
     <header className="site-navbar">
       <div className="site-navbar-inner">
         {/* Brand */}
-        <Link to="/login" className="navbar-brand">
+        <Link to="/" className="navbar-brand">
           <div className="navbar-brand-icon">C</div>
 
           <div className="navbar-brand-text">
